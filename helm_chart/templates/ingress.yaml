@@ -15,7 +15,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  ingressClassName: {{ .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.ingressClass }}
   {{- if .Values.ingress.tls }}
   tls:
     {{- range .Values.ingress.tls }}
@@ -38,7 +38,7 @@ spec:
                 name: {{ $fullName }}
                 port:
                   number: 80
-            pathType: ImplementationSpecific
+            pathType: Prefix
 
           {{- end }}
     {{- end }}
@@ -52,7 +52,7 @@ spec:
                 name: {{ $fullName }}
                 port:
                   number: 80
-            pathType: ImplementationSpecific
+            pathType: Prefix
           {{- end }}
     {{- end }}
   {{- end }}
