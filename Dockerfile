@@ -3,5 +3,5 @@ ENV context ""
 ENV port 8022
 ADD /src/main/resources/application.properties //
 ADD /target/corejava17-with-maven-template-1.0-SNAPSHOT.one-jar.jar //
-ENTRYPOINT ["java","-jar", "/corejava17-with-maven-template-1.0-SNAPSHOT.one-jar.jar","--server.port=${port}"]
+ENTRYPOINT ["java","-jar", "/corejava17-with-maven-template-1.0-SNAPSHOT-jar-with-dependencies.jar","--server.port=${port}"]
 
