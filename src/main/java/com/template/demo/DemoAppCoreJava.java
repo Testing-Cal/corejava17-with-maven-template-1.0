@@ -1,13 +1,13 @@
 package com.template.demo;
 
-import org.apache.catalina.Context;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.startup.Tomcat;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.startup.Tomcat;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -36,7 +36,7 @@ public class DemoAppCoreJava {
         Tomcat tomcat = new Tomcat();
         tomcat.setBaseDir("temp");
         tomcat.setPort(Integer.parseInt(port));
-
+        tomcat.getConnector();
         Context ctx = tomcat.addContext("", new File(".").getAbsolutePath());
 
         Tomcat.addServlet(ctx, servletName, new HttpServlet() {
