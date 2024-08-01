@@ -322,12 +322,12 @@ pipeline {
 
                     if (env.SONAR_CREDENTIAL_ID != null && env.SONAR_CREDENTIAL_ID != '') {
                          withCredentials([usernamePassword(credentialsId: "$SONAR_CREDENTIAL_ID", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                            sh """JAVA_HOME=/usr/lib/jvm/jdk-15 mvn --batch-mode -V -U -e org.sonarsource.scanner.maven:sonar-maven-plugin:3.5.0.1254:sonar -Dsonar.java.binaries='.' -Dsonar.exclusions='pom.xml, target/**/*' -Dsonar.projectKey="${sonar_project_key}" -Dsonar.projectName="${sonar_project_key}" -Dsonar.host.url="${metadataVars.sonarHost}" -Dsonar.organization="${metadataVars.sonarOrg}" -Dsonar.login=$PASSWORD"""
+                            sh """JAVA_HOME=/usr/lib/jvm/jdk-15 mvn --batch-mode -V -U -e org.sonarsource.scanner.maven:sonar-maven-plugin:3.5.0.1254:sonar -Dsonar.java.binaries='.' -Dsonar.exclusions='pom.xml, target/**/*' -Dsonar.projectKey="${sonar_project_key}" -Dsonar.projectName="${sonar_project_key}" -Dsonar.sources=src -Dsonar.host.url="${metadataVars.sonarHost}" -Dsonar.organization="${metadataVars.sonarOrg}" -Dsonar.login=$PASSWORD"""
                           }
                     }
                     else{
                         withSonarQubeEnv('pg-sonar') {
-                            sh """JAVA_HOME=/usr/lib/jvm/jdk-15 mvn --batch-mode -V -U -e org.sonarsource.scanner.maven:sonar-maven-plugin:3.5.0.1254:sonar -Dsonar.java.binaries='.' -Dsonar.exclusions='pom.xml, target/**/*' -Dsonar.projectKey="${sonar_project_key}" -Dsonar.projectName="${sonar_project_key}" -Dsonar.organization="${metadataVars.sonarOrg}" """
+                            sh """JAVA_HOME=/usr/lib/jvm/jdk-15 mvn --batch-mode -V -U -e org.sonarsource.scanner.maven:sonar-maven-plugin:3.5.0.1254:sonar -Dsonar.java.binaries='.' -Dsonar.exclusions='pom.xml, target/**/*' -Dsonar.projectKey="${sonar_project_key}" -Dsonar.projectName="${sonar_project_key}" -Dsonar.sources=src -Dsonar.organization="${metadataVars.sonarOrg}" """
                             }
                     }
 
