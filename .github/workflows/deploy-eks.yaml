@@ -42,8 +42,9 @@ jobs:
           export REGISTRY_URL="$(echo "$JSON_STRING" | jq -r '.general.containerImagePath')"
           echo "DOCKER_LOGIN_URL=$(echo "$REGISTRY_URL" | cut -d'/' -f1)" >> "$GITHUB_ENV"
           echo "ACTION=$(echo "$JSON_STRING" | jq -r '.general.action')" >> "$GITHUB_ENV"
+          echo "SECRET_NAME=$(echo "$ARTIFACTORY_PASSWORD_SECRET" | tr '[:upper:]' '[:lower:]' | cut -c1-62)" >> "$GITHUB_ENV"
 
-          #promotion workflow
+          #promotion workfl
           echo "PROMOTE_SOURCE=$(echo "$JSON_STRING" | jq -r '.general.promoteSource')" >> "$GITHUB_ENV"
           echo "PROMOTE_SOURCE_ARTIFACTORY_USER_SECRET=$(echo "$JSON_STRING" | jq -r '.general.promoteSourceArtifactoryUserSecret')" >> "$GITHUB_ENV"
           echo "PROMOTE_SOURCE_ARTIFACTORY_PASSWORD_SECRET(echo "$JSON_STRING" | jq -r '.general.promoteSourceArtifactoryPasswordSecret')" >> "$GITHUB_ENV"
@@ -90,15 +91,15 @@ jobs:
            if [[ $ARTIFACTORY != "ECR" ]]
            then
              ## hardcoded name regcred need to be change
-             docker run --rm  --user root -v "$HOME/.kube/config":"/.kube/config" -e KUBECONFIG="/.kube/config" $KUBECTL_IMAGE_VERSION -n "$KUBE_NAMESPACE" delete secret "$ARTIFACTORY_PASSWORD_SECRET" --ignore-not-found || true
-             docker run --rm  --user root -v "$HOME/.kube/config":"/.kube/config" -e KUBECONFIG="/.kube/config" $KUBECTL_IMAGE_VERSION -n "$KUBE_NAMESPACE" create secret docker-registry "$ARTIFACTORY_PASSWORD_SECRET" --docker-server="$DOCKER_LOGIN_URL" --docker-username=${{ secrets[env.ARTIFACTORY_USER_SECRET] }} --docker-password=${{ secrets[env.ARTIFACTORY_PASSWORD_SECRET] }} || true
+             docker run --rm  --user root -v "$HOME/.kube/config":"/.kube/config" -e KUBECONFIG="/.kube/config" $KUBECTL_IMAGE_VERSION -n "$KUBE_NAMESPACE" delete secret "$SECRET_NAME" --ignore-not-found || true
+             docker run --rm  --user root -v "$HOME/.kube/config":"/.kube/config" -e KUBECONFIG="/.kube/config" $KUBECTL_IMAGE_VERSION -n "$KUBE_NAMESPACE" create secret docker-registry "$SECRET_NAME" --docker-server="$DOCKER_LOGIN_URL" --docker-username=${{ secrets[env.ARTIFACTORY_USER_SECRET] }} --docker-password=${{ secrets[env.ARTIFACTORY_PASSWORD_SECRET] }} || true
            fi
             
            echo "context: $CONTEXT" >> Helm.yaml
            cat Helm.yaml
            sed -i s+#SERVICE_NAME#+"$HELM_RELEASE_NAME"+g ./helm_chart/values.yaml ./helm_chart/Chart.yaml
-           docker run --rm  --user root -v "$HOME/.kube/config":"/.kube/config" -e KUBECONFIG="/.kube/config" -v "$GITHUB_WORKSPACE":/apps -w /apps $HELM_IMAGE_VERSION template "$HELM_RELEASE_NAME" -n "$KUBE_NAMESPACE" helm_chart --atomic --timeout 300s --set image.repository="$REGISTRY_URL" --set image.tag="$BUILD_TAG" --set image.registrySecret="$ARTIFACTORY_PASSWORD_SECRET" -f Helm.yaml
-           docker run --rm  --user root -v "$HOME/.kube/config":"/.kube/config" -e KUBECONFIG="/.kube/config" -v "$GITHUB_WORKSPACE":/apps -w /apps $HELM_IMAGE_VERSION upgrade --install "$HELM_RELEASE_NAME" -n "$KUBE_NAMESPACE" helm_chart --atomic --timeout 300s --set image.repository="$REGISTRY_URL" --set image.tag="$BUILD_TAG" --set image.registrySecret="$ARTIFACTORY_PASSWORD_SECRET" -f Helm.yaml
+           docker run --rm  --user root -v "$HOME/.kube/config":"/.kube/config" -e KUBECONFIG="/.kube/config" -v "$GITHUB_WORKSPACE":/apps -w /apps $HELM_IMAGE_VERSION template "$HELM_RELEASE_NAME" -n "$KUBE_NAMESPACE" helm_chart --atomic --timeout 300s --set image.repository="$REGISTRY_URL" --set image.tag="$BUILD_TAG" --set image.registrySecret="$SECRET_NAME" -f Helm.yaml
+           docker run --rm  --user root -v "$HOME/.kube/config":"/.kube/config" -e KUBECONFIG="/.kube/config" -v "$GITHUB_WORKSPACE":/apps -w /apps $HELM_IMAGE_VERSION upgrade --install "$HELM_RELEASE_NAME" -n "$KUBE_NAMESPACE" helm_chart --atomic --timeout 300s --set image.repository="$REGISTRY_URL" --set image.tag="$BUILD_TAG" --set image.registrySecret="$SECRET_NAME" -f Helm.yaml
 
       - name: Destroy
         if: env.ACTION == 'DESTROY'
