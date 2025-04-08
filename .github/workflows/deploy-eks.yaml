@@ -42,7 +42,7 @@ jobs:
           export REGISTRY_URL="$(echo "$JSON_STRING" | jq -r '.general.containerImagePath')"
           echo "DOCKER_LOGIN_URL=$(echo "$REGISTRY_URL" | cut -d'/' -f1)" >> "$GITHUB_ENV"
           echo "ACTION=$(echo "$JSON_STRING" | jq -r '.general.action')" >> "$GITHUB_ENV"
-          echo "SECRET_NAME=$(eecho "$JSON_STRING" | jq -r '.general.artifactoryPasswordSecret' | tr '[:upper:]' '[:lower:]' | cut -c1-62)" >> "$GITHUB_ENV"
+          echo "SECRET_NAME=$(echo "$JSON_STRING" | jq -r '.general.artifactoryPasswordSecret' | tr '[:upper:]' '[:lower:]' | cut -c1-62)" >> "$GITHUB_ENV"
 
           #promotion workfl
           echo "PROMOTE_SOURCE=$(echo "$JSON_STRING" | jq -r '.general.promoteSource')" >> "$GITHUB_ENV"
