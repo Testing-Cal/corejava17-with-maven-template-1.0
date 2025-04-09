@@ -105,3 +105,25 @@ jobs:
         if: env.ACTION == 'DESTROY'
         run: | 
          docker run --rm  --user root -v "$HOME/.kube/config":"/.kube/config" -e KUBECONFIG="/.kube/config" -v "$GITHUB_WORKSPACE":/apps -w /apps $HELM_IMAGE_VERSION uninstall "$HELM_RELEASE_NAME" -n "$KUBE_NAMESPACE"  
+
+      - name: Push to collector
+        if: always()
+        run: |
+          sudo chown -R `id -u`:`id -g` "$GITHUB_WORKSPACE"
+          echo "Workflow Run ID:${GITHUB_RUN_ID}, Workflow Run Number: ${GITHUB_RUN_NUMBER}, Workflow Name: ${GITHUB_WORKFLOW}, Github Repository: ${GITHUB_REPOSITORY}, Job Name: ${GITHUB_JOB}, Tenant ID: $TENANT_ID, Target URI: $TARGET_URI"
+          if [[ $TENANT_ID != "" && $TARGET_URI != "" ]];then 
+                curl -k -X POST "$TARGET_URI/collector/orchestrator/devops/details" \
+                  -H 'X-TenantID: $TENANT_ID' \
+                  -H 'Content-Type: application/json'\
+                  -d '{
+                        "workflowName": "'"${GITHUB_WORKFLOW}"'",
+                        "workflowId": "'"${GITHUB_RUN_ID}"'",
+                        "workflowNumber": "'"${GITHUB_RUN_ID}"'",
+                        "repo": "'"${GITHUB_REPOSITORY}"'",
+                        "agentId": "'"${AGENT_ID}"'",
+                        "devopsConfigId": "'"${DEVOPS_SETTING_ID}"'",
+                        "agentApiKey": "'"${AGENT_API_KEY}"'",
+                        "buildNumber": "'"${GITHUB_RUN_NUMBER}"'"
+                      }'
+                echo "push to collector stage Completed"
+          fi
