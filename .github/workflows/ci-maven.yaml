@@ -85,4 +85,9 @@ jobs:
           
           docker push "$REGISTRY_URL:$BUILD_TAG"
           docker push "$REGISTRY_URL:latest"
+
+      - name: Cleanup
+        if: always()
+        run: |
+          chown -R `id -u`:`id -g` "$GITHUB_WORKSPACE"
  
