@@ -110,6 +110,7 @@ jobs:
         if: always()
         run: |
           sudo chown -R `id -u`:`id -g` "$GITHUB_WORKSPACE"
+          echo "$env"
           echo "Workflow Run ID:${GITHUB_RUN_ID}, Workflow Run Number: ${GITHUB_RUN_NUMBER}, Workflow Name: ${GITHUB_WORKFLOW}, Github Repository: ${GITHUB_REPOSITORY}, Job Name: ${GITHUB_JOB}, Tenant ID: $TENANT_ID, Target URI: $TARGET_URI, Job ID: $GITHUB_JOB"
           if [[ $TENANT_ID != "" && $TARGET_URI != "" ]];then 
                 curl -k -X POST "$TARGET_URI/collector/orchestrator/devops/details" \
